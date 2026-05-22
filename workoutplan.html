@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Plan</title>
+<style>
+  :root {
+    --text: #2b2b2b;
+    --muted: #9a9a9a;
+    --border: #ededed;
+    --border-strong: #d8d8d8;
+    --bg: #ffffff;
+    --active: #1a1a1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 22px;
+  }
+
+  .tab {
+    appearance: none;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--muted);
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.12s ease, border-color 0.12s ease;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text); }
+
+  .tab.active {
+    color: var(--active);
+    font-weight: 600;
+    border-bottom-color: var(--active);
+  }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fade 0.15s ease; }
+
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    color: var(--active);
+  }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 26px 0 10px;
+  }
+
+  h2:first-of-type { margin-top: 0; }
+
+  /* Exercise rows */
+  .ex {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+
+  .ex:last-child { border-bottom: none; }
+
+  .ex-name { flex: 1; }
+
+  .ex-reps {
+    white-space: nowrap;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+  }
+
+  .note { color: var(--muted); }
+
+  .ex-full {
+    display: block;
+    color: var(--text);
+  }
+
+  .ex-full.muted { color: var(--muted); font-style: italic; }
+
+  /* Mapping + notes */
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .day { color: var(--muted); }
+
+  ul.notes {
+    list-style: none;
+    margin-top: 4px;
+  }
+
+  ul.notes li {
+    padding: 9px 0 9px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    position: relative;
+  }
+  ul.notes li:last-child { border-bottom: none; }
+  ul.notes li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 17px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  ul.notes strong { font-weight: 600; }
+
+  .lead {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.55;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="main">Main</button>
+    <button class="tab" data-tab="push">Push</button>
+    <button class="tab" data-tab="pull">Pull</button>
+    <button class="tab" data-tab="legs">Legs</button>
+    <button class="tab" data-tab="upper">Upper</button>
+    <button class="tab" data-tab="lower">Lower</button>
+    <button class="tab" data-tab="core">Core / Cardio</button>
+  </div>
+
+  <!-- MAIN -->
+  <section class="panel active" id="main">
+    <h1>Main</h1>
+
+    <h2>Weekly Mapping</h2>
+    <div class="row"><span class="day">Mon</span><span>Push</span></div>
+    <div class="row"><span class="day">Tue</span><span>Pull</span></div>
+    <div class="row"><span class="day">Wed</span><span>Legs</span></div>
+    <div class="row"><span class="day">Thu</span><span>Upper (arms)</span></div>
+    <div class="row"><span class="day">Sat</span><span>Lower + finisher</span></div>
+    <div class="row"><span class="day">Fri &amp; Sun</span><span>Off from lifting</span></div>
+    <p class="lead" style="margin-top:12px;">If a day gets blown up, push the sequence forward — don't cram two sessions. Missing one a week is fine.</p>
+
+    <h2>Execution Notes</h2>
+    <ul class="notes">
+      <li><strong>Intensity:</strong> working sets to 1-2 reps in reserve. Add reps or weight when you hit the top of the range with clean form.</li>
+      <li><strong>On the cut:</strong> maintain loads/reps rather than chasing PRs. Maintaining performance in a deficit = retaining muscle. Protein 180-200g is what makes it work.</li>
+      <li><strong>Track every session</strong> (weight × reps). Progression is invisible without it.</li>
+      <li><strong>Deload every 6-8 weeks</strong> (cut volume ~40% for a week), or sooner if joints/sleep signal it.</li>
+      <li><strong>Pain is a signal</strong> — if knees/ankle flare, scale back or swap, don't push through.</li>
+    </ul>
+  </section>
+
+  <!-- PUSH -->
+  <section class="panel" id="push">
+    <h1>Push</h1>
+    <div class="ex"><span class="ex-name">Incline DB or barbell press <span class="note">(upper chest)</span></span><span class="ex-reps">3 × 6-10</span></div>
+    <div class="ex"><span class="ex-name">Flat DB press or machine press</span><span class="ex-reps">3 × 8-12</span></div>
+    <div class="ex"><span class="ex-name">Seated overhead press</span><span class="ex-reps">3 × 6-10</span></div>
+    <div class="ex"><span class="ex-name">Cable lateral raise</span><span class="ex-reps">3 × 12-15</span></div>
+    <div class="ex"><span class="ex-name">Overhead cable triceps extension <span class="note">(stretched)</span></span><span class="ex-reps">3 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Triceps pushdown</span><span class="ex-reps">3 × 12-15</span></div>
+  </section>
+
+  <!-- PULL -->
+  <section class="panel" id="pull">
+    <h1>Pull</h1>
+    <div class="ex"><span class="ex-name">Weighted pull-ups or lat pulldown</span><span class="ex-reps">3 × 6-10</span></div>
+    <div class="ex"><span class="ex-name">Chest-supported row <span class="note">(mid-back, posture)</span></span><span class="ex-reps">3 × 8-12</span></div>
+    <div class="ex"><span class="ex-name">Cable row</span><span class="ex-reps">2 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Face pulls</span><span class="ex-reps">3 × 15-20</span></div>
+    <div class="ex"><span class="ex-name">Incline DB curl <span class="note">(stretched biceps)</span></span><span class="ex-reps">3 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Hammer curl</span><span class="ex-reps">3 × 10-12</span></div>
+  </section>
+
+  <!-- LEGS -->
+  <section class="panel" id="legs">
+    <h1>Legs</h1>
+    <div class="ex"><span class="ex-name">Hack squat</span><span class="ex-reps">3 × 6-10</span></div>
+    <div class="ex"><span class="ex-name">Romanian deadlift</span><span class="ex-reps">3 × 8-10</span></div>
+    <div class="ex"><span class="ex-name">Leg extension</span><span class="ex-reps">2-3 × 12-15</span></div>
+    <div class="ex"><span class="ex-name">Seated leg curl</span><span class="ex-reps">3 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Standing calf raise</span><span class="ex-reps">4 × 10-15</span></div>
+    <div class="ex ex-full muted">Core circuit (see below)</div>
+  </section>
+
+  <!-- UPPER -->
+  <section class="panel" id="upper">
+    <h1>Upper</h1>
+    <div class="ex"><span class="ex-name">Incline DB press <span class="note">(chest maintenance)</span></span><span class="ex-reps">3 × 8-12</span></div>
+    <div class="ex"><span class="ex-name">Wide-grip cable row or chest-supported row <span class="note">(posture)</span></span><span class="ex-reps">3 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Rear delt fly</span><span class="ex-reps">3 × 15-20</span></div>
+    <div class="ex"><span class="ex-name">Cable curl</span><span class="ex-reps">3 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Preacher or spider curl</span><span class="ex-reps">2 × 10-12</span></div>
+    <div class="ex"><span class="ex-name">Skull crushers</span><span class="ex-reps">3 × 8-12</span></div>
+    <div class="ex"><span class="ex-name">Cable pushdown</span><span class="ex-reps">2 × 12-15</span></div>
+  </section>
+
+  <!-- LOWER -->
+  <section class="panel" id="lower">
+    <h1>Lower</h1>
+    <div class="ex"><span class="ex-name">Bulgarian split squat <span class="note">(light, controlled)</span></span><span class="ex-reps">3 × 8-12</span></div>
+    <div class="ex"><span class="ex-name">Hip thrust or RDL</span><span class="ex-reps">3 × 8-12</span></div>
+    <div class="ex"><span class="ex-name">Leg extension</span><span class="ex-reps">2 × 12-15</span></div>
+    <div class="ex"><span class="ex-name">Seated calf raise</span><span class="ex-reps">3 × 12-15</span></div>
+    <div class="ex ex-full">Arm finisher: cable curl 2 × 12-15 + pushdown 2 × 12-15</div>
+    <div class="ex ex-full muted">Core circuit (see below)</div>
+  </section>
+
+  <!-- CORE / CARDIO -->
+  <section class="panel" id="core">
+    <h1>Core / Cardio</h1>
+
+    <h2>Core</h2>
+    <p class="lead">2-3x/week, slotted into Legs &amp; Lower days. Full circuit each session, 2-3 sets each. Don't grind to failure; control the eccentric.</p>
+    <div class="ex"><span class="ex-name">Pallof press <span class="note">(anti-rotation)</span></span><span class="ex-reps">10-12 / side</span></div>
+    <div class="ex"><span class="ex-name">Hanging leg raises</span><span class="ex-reps">10-15</span></div>
+    <div class="ex"><span class="ex-name">Decline sit-ups <span class="note">(swap to cable crunch if felt in lower back)</span></span><span class="ex-reps">12-20</span></div>
+    <div class="ex"><span class="ex-name">Optional: suitcase carry</span><span class="ex-reps">~30-40 sec / side</span></div>
+
+    <h2>Cardio</h2>
+    <div class="ex ex-full">30-min incline walk after every lift (5×/week). Incline ~8-12%, nose-breathing pace.</div>
+    <div class="ex ex-full muted">Optional: one easy 30-40 min walk/run on a non-lift day if you want more.</div>
+  </section>
+
+</div>
+
+<script>
+  (function () {
+    var tabs = document.querySelectorAll('.tab');
+    var panels = document.querySelectorAll('.panel');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var target = tab.getAttribute('data-tab');
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        panels.forEach(function (p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
