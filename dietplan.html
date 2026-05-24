@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Plan</title>
+<style>
+  :root {
+    --text: #2b2b2b;
+    --muted: #9a9a9a;
+    --border: #ededed;
+    --border-strong: #d8d8d8;
+    --bg: #ffffff;
+    --active: #1a1a1a;
+    --subtle-bg: #f7f7f7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 22px;
+  }
+
+  .tab {
+    appearance: none;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--muted);
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.12s ease, border-color 0.12s ease;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text); }
+
+  .tab.active {
+    color: var(--active);
+    font-weight: 600;
+    border-bottom-color: var(--active);
+  }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fade 0.15s ease; }
+
+  @keyframes fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    color: var(--active);
+  }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 28px 0 10px;
+  }
+
+  h2:first-of-type { margin-top: 0; }
+
+  /* Stat blocks on main page */
+  .stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    flex: 1;
+    min-width: 140px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--active);
+    letter-spacing: -0.02em;
+  }
+
+  .stat-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Meal breakdown rows on main */
+  .meal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+
+  .meal-row:last-child { border-bottom: none; }
+  .meal-row .meal-name { color: var(--text); }
+  .meal-row .meal-macros { color: var(--muted); font-size: 13.5px; white-space: nowrap; }
+
+  /* Notes on main */
+  ul.notes {
+    list-style: none;
+    margin-top: 4px;
+  }
+
+  ul.notes li {
+    padding: 9px 0 9px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  ul.notes li:last-child { border-bottom: none; }
+
+  ul.notes li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  ul.notes strong { font-weight: 600; }
+
+  /* Food item rows */
+  .food-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .food-item:last-child { border-bottom: none; }
+
+  .food-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .food-name {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--active);
+    flex: 1;
+  }
+
+  .food-macros {
+    white-space: nowrap;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .food-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Recipe / instructions */
+  .recipe {
+    margin-top: 10px;
+    background: var(--subtle-bg);
+    border-radius: 5px;
+    padding: 10px 14px;
+  }
+
+  .recipe-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .recipe ol {
+    padding-left: 16px;
+    margin: 0;
+  }
+
+  .recipe ol li {
+    font-size: 13.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.45;
+  }
+
+  .recipe ol li:last-child { margin-bottom: 0; }
+
+  /* Eating out section */
+  .eating-rule {
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .eating-rule:last-child { border-bottom: none; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .tag-good { background: #e8e8e8; color: #2b2b2b; }
+  .tag-avoid { background: #2b2b2b; color: #ffffff; }
+  .tag-tip { background: #f0f0f0; color: #666; }
+
+  .lead {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab active" data-tab="main">Main</button>
+    <button class="tab" data-tab="breakfast">Breakfast</button>
+    <button class="tab" data-tab="lunch">Lunch</button>
+    <button class="tab" data-tab="dinner">Dinner</button>
+    <button class="tab" data-tab="snacks">Snacks &amp; Eating Out</button>
+  </div>
+
+  <!-- MAIN -->
+  <section class="panel active" id="main">
+    <h1>Daily Goals</h1>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Calories</div>
+        <div class="stat-value">2,700–2,800</div>
+        <div class="stat-sub">moderate cut from ~3,200 active TDEE</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Protein</div>
+        <div class="stat-value">180–200g</div>
+        <div class="stat-sub">non-negotiable — preserves muscle on the cut</div>
+      </div>
+    </div>
+
+    <h2>What That Looks Like</h2>
+    <div class="meal-row">
+      <span class="meal-name">Breakfast</span>
+      <span class="meal-macros">~450–500 cal &nbsp;·&nbsp; ~40g protein</span>
+    </div>
+    <div class="meal-row">
+      <span class="meal-name">Lunch</span>
+      <span class="meal-macros">~650–750 cal &nbsp;·&nbsp; ~55g protein</span>
+    </div>
+    <div class="meal-row">
+      <span class="meal-name">Dinner</span>
+      <span class="meal-macros">~700–800 cal &nbsp;·&nbsp; ~55g protein</span>
+    </div>
+    <div class="meal-row">
+      <span class="meal-name">Snack</span>
+      <span class="meal-macros">~300–400 cal &nbsp;·&nbsp; ~30–35g protein</span>
+    </div>
+    <div class="meal-row" style="font-weight:600;">
+      <span class="meal-name">Total</span>
+      <span class="meal-macros" style="color:var(--active);">~2,700 cal &nbsp;·&nbsp; ~185g protein</span>
+    </div>
+
+    <h2>Tracking Notes</h2>
+    <ul class="notes">
+      <li><strong>Weigh daily, track weekly average.</strong> If losing &gt;1.5 lbs/week, add 150–200 cal. If weight stalls for 3 weeks, drop 150–200 cal.</li>
+      <li><strong>Hit protein first.</strong> If you're short on calories but protein is hit, you're fine. If protein is short, fix it.</li>
+      <li><strong>Keep carbs around training.</strong> Don't slash carbs aggressively — they fuel performance and protect mood.</li>
+      <li><strong>Spinach hack.</strong> Add a handful of raw spinach to your protein shake — zero taste, strong micronutrient boost. Take a greens powder on days you eat nothing green.</li>
+    </ul>
+  </section>
+
+  <!-- BREAKFAST -->
+  <section class="panel" id="breakfast">
+    <h1>Breakfast</h1>
+    <p class="lead">Target: ~450–500 cal, ~40g protein</p>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Protein shake + banana</span>
+        <span class="food-macros">~420 cal &nbsp;·&nbsp; 45g protein</span>
+      </div>
+      <div class="food-note">Fastest option. Spinach optional — you won't taste it.</div>
+      <div class="recipe">
+        <div class="recipe-label">How to make</div>
+        <ol>
+          <li>Add 1 scoop (40g) whey protein + 1 cup milk (or water for fewer cals) to a blender.</li>
+          <li>Add 1 medium banana. Optional: handful of raw spinach.</li>
+          <li>Blend 20 seconds. Done.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Egg white, cheese &amp; bacon wrap — deli</span>
+        <span class="food-macros">~430 cal &nbsp;·&nbsp; 33g protein</span>
+      </div>
+      <div class="food-note">Ask for egg whites to cut fat. Cheese and bacon stay.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Egg &amp; cheese wrap + turkey sausage — Dunkin</span>
+        <span class="food-macros">~440 cal &nbsp;·&nbsp; 30g protein</span>
+      </div>
+      <div class="food-note">Turkey sausage over regular sausage for better protein-to-fat ratio.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Egg + turkey or ham on wrap — deli</span>
+        <span class="food-macros">~420 cal &nbsp;·&nbsp; 28g protein</span>
+      </div>
+      <div class="food-note">Solid fallback. Add a protein shake on the side if you need more protein.</div>
+    </div>
+  </section>
+
+  <!-- LUNCH -->
+  <section class="panel" id="lunch">
+    <h1>Lunch</h1>
+    <p class="lead">Target: ~650–750 cal, ~55g protein</p>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Chipotle bowl — double chicken</span>
+        <span class="food-macros">~700 cal &nbsp;·&nbsp; 65g protein</span>
+      </div>
+      <div class="food-note">Half rice, black beans, fajita veggies, mild + corn salsa. No sour cream. Cheese is fine.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Duke's spicy chicken teriyaki — rice</span>
+        <span class="food-macros">~700 cal &nbsp;·&nbsp; 50g protein</span>
+      </div>
+      <div class="food-note">Best regular option at Duke's. Rice over noodles on a cut.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Duke's romaine salad — spicy chicken</span>
+        <span class="food-macros">~525 cal &nbsp;·&nbsp; 45g protein</span>
+      </div>
+      <div class="food-note">Add: hard boiled egg, chickpeas, avocado, cucumber, red onion. Dressing on the side, use sparingly.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Duke's chicken or turkey sandwich</span>
+        <span class="food-macros">~550 cal &nbsp;·&nbsp; 40g protein</span>
+      </div>
+      <div class="food-note">Light on mayo or creamy sauces. Mustard or hot sauce instead.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Halal cart — chicken over rice</span>
+        <span class="food-macros">~650 cal &nbsp;·&nbsp; 50g protein</span>
+      </div>
+      <div class="food-note">Half rice portion, light white sauce, hot sauce is fine.</div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Sweetgreen / Cava protein bowl</span>
+        <span class="food-macros">~600 cal &nbsp;·&nbsp; 50g protein</span>
+      </div>
+      <div class="food-note">Chicken or salmon base. Load protein and vegetables. Dressing on the side.</div>
+    </div>
+  </section>
+
+  <!-- DINNER -->
+  <section class="panel" id="dinner">
+    <h1>Dinner</h1>
+    <p class="lead">Target: ~700–800 cal, ~55g protein</p>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Lean ground beef + rice + vegetables</span>
+        <span class="food-macros">~750 cal &nbsp;·&nbsp; 55g protein</span>
+      </div>
+      <div class="food-note">Use 90/10 or 93/7 beef — comparable to chicken, more flavor, easier to mix vegetables in. Makes 3–4 servings.</div>
+      <div class="recipe">
+        <div class="recipe-label">How to make</div>
+        <ol>
+          <li>Heat a pan over medium-high. Add 1 lb 90/10 ground beef. Break it up, season with salt, pepper, garlic powder.</li>
+          <li>Cook until no pink remains (~7–8 min). Drain excess fat if needed.</li>
+          <li>Add frozen vegetables (broccoli, mixed veg, or peas) directly to the pan. Cover with a lid for 3–4 min to steam.</li>
+          <li>Serve over cooked white or brown rice. Season with soy sauce, hot sauce, or whatever you like.</li>
+          <li>Divide into 3–4 containers for the week.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Meal prep chicken + rice + frozen vegetables</span>
+        <span class="food-macros">~700 cal &nbsp;·&nbsp; 55g protein</span>
+      </div>
+      <div class="food-note">Cook Sunday, eat Mon–Thu. Makes 4 servings.</div>
+      <div class="recipe">
+        <div class="recipe-label">How to make</div>
+        <ol>
+          <li>Season 4 chicken thighs or breasts with salt, pepper, garlic, paprika.</li>
+          <li>Air fryer: 375°F for 20–22 min. Or stovetop: medium heat, 6–7 min per side until cooked through.</li>
+          <li>Cook 2 cups dry rice (rice cooker or pot per package instructions).</li>
+          <li>Microwave a bag of frozen vegetables 3–4 min.</li>
+          <li>Divide chicken, rice, and veggies into 4 containers. Refrigerates well for 4–5 days.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Trader Joe's rotisserie + microwave rice + frozen vegetables</span>
+        <span class="food-macros">~650 cal &nbsp;·&nbsp; 55g protein</span>
+      </div>
+      <div class="food-note">Fastest dinner. One rotisserie chicken = 3–4 meals worth of protein.</div>
+      <div class="recipe">
+        <div class="recipe-label">How to make</div>
+        <ol>
+          <li>Pull chicken off the bone — mix white and dark meat for taste and volume.</li>
+          <li>Microwave a rice cup (Uncle Ben's or similar) 90 seconds.</li>
+          <li>Microwave a bag of frozen vegetables 3 min.</li>
+          <li>Combine. Season with whatever you have — hot sauce, soy sauce, salt and pepper.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Dining hall — grilled protein + carb + vegetable</span>
+        <span class="food-macros">~650 cal &nbsp;·&nbsp; 50g protein</span>
+      </div>
+      <div class="food-note">Grilled chicken or fish + rice or potato + one vegetable. Build a plate, don't graze. Use your meal plan for a protein shake or smoothie if you need to top up protein.</div>
+    </div>
+  </section>
+
+  <!-- SNACKS + EATING OUT -->
+  <section class="panel" id="snacks">
+    <h1>Snacks &amp; Eating Out</h1>
+
+    <h2>Snacks</h2>
+    <p class="lead">Target: ~300–400 cal, ~30–35g protein. Use to fill gaps after your three meals.</p>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Greek yogurt (full container, plain or low-fat)</span>
+        <span class="food-macros">~150 cal &nbsp;·&nbsp; 17g protein</span>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Cottage cheese (1 cup)</span>
+        <span class="food-macros">~200 cal &nbsp;·&nbsp; 25g protein</span>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Protein shake with water</span>
+        <span class="food-macros">~150 cal &nbsp;·&nbsp; 25g protein</span>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Beef jerky (1 oz serving)</span>
+        <span class="food-macros">~80 cal &nbsp;·&nbsp; 9g protein</span>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Hard boiled eggs × 2</span>
+        <span class="food-macros">~140 cal &nbsp;·&nbsp; 12g protein</span>
+      </div>
+    </div>
+
+    <div class="food-item">
+      <div class="food-header">
+        <span class="food-name">Protein bar</span>
+        <span class="food-macros">~200–220 cal &nbsp;·&nbsp; 20–25g protein</span>
+      </div>
+      <div class="food-note">Check sugar content — keep it under 10g. Quest, Built, or RXBar are reliable choices.</div>
+    </div>
+
+    <h2>Eating Out — Italian</h2>
+    <p class="lead">Rule: red sauce &gt; cream sauce. Moderate the pasta portion (restaurants serve ~2× a normal amount). Tomato-based dishes are very manageable on a cut.</p>
+
+    <div class="eating-rule">
+      <span class="tag tag-good">Good</span>
+      <strong>Chicken parm</strong> — solid protein, tomato sauce. Eat half the pasta or push it aside if you're close on calories.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-good">Good</span>
+      <strong>Bolognese</strong> — meat-based tomato sauce, reasonable. Eat a normal portion of pasta, not the whole plate.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-good">Good</span>
+      <strong>Grilled fish / branzino</strong> — cleanest option on most menus.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-good">Good</span>
+      <strong>Minestrone soup</strong> — great starter, low calorie, fills you up before the main.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-avoid">Limit</span>
+      <strong>Alfredo</strong> — butter + cream + cheese, highest-calorie option on most Italian menus.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-avoid">Limit</span>
+      <strong>Carbonara</strong> — cream and egg heavy. Same category as alfredo.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-avoid">Limit</span>
+      <strong>Bread basket</strong> — have 1–2 pieces if you want, but don't mindlessly eat it while waiting.
+    </div>
+
+    <div class="eating-rule">
+      <span class="tag tag-tip">Tip</span>
+      Enjoy the meal. One Italian dinner a week doesn't break a cut. Pick red sauce, moderate the pasta portion, skip the second bread roll.
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  (function () {
+    var tabs = document.querySelectorAll('.tab');
+    var panels = document.querySelectorAll('.panel');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var target = tab.getAttribute('data-tab');
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        panels.forEach(function (p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
